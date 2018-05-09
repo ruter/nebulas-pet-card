@@ -96,6 +96,7 @@
             return {
                 account: null,
                 currentStep: 0,
+                serialNumber: '',
                 petCardForm: {
                     name: '',
                     date: '',
@@ -133,24 +134,27 @@
                 this.$refs[name].validate((valid) => {
                     if (valid) {
                         this.currentStep++;
-                        this.$Message.success('Success!');
                     } else {
-                        this.$Message.error('Fail!');
+                        this.$Message.error('请将信息填写完整');
                     }
                 })
             },
             handleConfirmClick() {
-                let info = this.petCardForm;
+                let info = {
+                    name: this.petCardForm.name,
+                    birthday: +this.petCardForm.birthday,
+                    photo: this.petCardForm.avatar,
+                    remark: this.petCardForm.desc
+                };
                 this.handleCreate(info);
             },
             handleCreate(info) {
                 let to = util.getContractAddress(),
-                    args = [util.toSting(info)];
-                nebPay.simulateCall(to, '0', 'createPetCard', args, {
+                    args = util.toSting([info]);
+                this.serialNumber = nebPay.call(to, '0', 'createPetCard', args, {
                     listener: (data) => {
                         this.currentStep++;
                         this.$Message.success('Success!');
-                        console.log(data);
                     }
                 });
             }

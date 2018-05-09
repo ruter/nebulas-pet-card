@@ -75,6 +75,10 @@ PetCardContract.prototype = {
         return this.transferFee;
     },
 
+    getAmountOfPetCards: function () {
+        return this.currentPetCardId;
+    },
+
     // 获取宠物卡
     getPetCardById: function (id) {
         return this.petCards.get(id);
