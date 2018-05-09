@@ -13,6 +13,10 @@ util.parse = function (data) {
     return JSON.parse(data);
 };
 
+util.toSting = function (data) {
+    return JSON.stringify(data);
+};
+
 util.title = function(title) {
     title = title ? title + ' - 宠物卡' : '宠物卡';
     window.document.title = title;

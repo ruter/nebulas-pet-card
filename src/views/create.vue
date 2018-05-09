@@ -83,9 +83,18 @@
     </div>
 </template>
 <script>
+    import util from '../libs/util';
+    import NebPay from '../libs/nebpay';
+    import {Neb, HttpRequest, Account} from 'nebulas';
+
+    var neb = new Neb();
+    var nebPay = new NebPay();
+    neb.setRequest(new HttpRequest("https://testnet.nebulas.io"));
+
     export default {
         data() {
             return {
+                account: null,
                 currentStep: 0,
                 petCardForm: {
                     name: '',
@@ -106,8 +115,20 @@
                 }
             }
         },
-
+        created() {
+            this.getAccount();
+        },
         methods: {
+            initAccount(data) {
+                const address = util.parse(data.result);
+                this.account = Account.fromAddress(address);
+            },
+            getAccount() {
+                let self = this;
+                nebPay.simulateCall(util.getContractAddress(), "0", "getUserAddress", "", {
+                    listener: self.initAccount
+                });
+            },
             handleNextClick(name) {
                 this.$refs[name].validate((valid) => {
                     if (valid) {
@@ -119,7 +140,19 @@
                 })
             },
             handleConfirmClick() {
-                this.currentStep++;
+                let info = this.petCardForm;
+                this.handleCreate(info);
+            },
+            handleCreate(info) {
+                let to = util.getContractAddress(),
+                    args = [util.toSting(info)];
+                nebPay.simulateCall(to, '0', 'createPetCard', args, {
+                    listener: (data) => {
+                        this.currentStep++;
+                        this.$Message.success('Success!');
+                        console.log(data);
+                    }
+                });
             }
         }
     };
