@@ -32,50 +32,56 @@
 </style>
 <template>
     <div class="index pet-mb-160">
-        <Row type="flex" justify="center" align="middle" v-if="found">
-            <Col span="4" style="text-align: center">
+        <Row type="flex" justify="center" align="middle">
+            <Col span="4" style="text-align: center" v-for="card in petCards" :key="card.id">
                 <Card class="pet-mb-32">
-                <Row type="flex" justify="center" align="middle" class="pet-pt-16 pet-pb-16">
-                    <Col span="24">
-                    <img class="pet-avatar" :src="avatar" alt="">
-                    </Col>
-                    <Col span="24">
-                    <Button type="error" shape="circle"
-                            icon="heart" size="large"
-                            @click="handleLikeClick">赞赏</Button>
-                    <router-link :to="'/detail/' + id">
-                        <Button type="ghost" shape="circle"
-                                icon="chatbubble-working" size="large">评论</Button>
-                    </router-link>
-                    </Col>
-                </Row>
-                <Row type="flex" justify="center" align="top" class="pet-pt-16 pet-pb-16">
-                    <Col span="24">
-                    <div>
-                        <Row type="flex" justify="center" align="top">
-                            <Col span="8">
-                            <p class="text-right"><Icon type="at"></Icon> ID</p>
-                            </Col>
-                            <Col span="16">
-                            <p class="text-left">{{ id }}</p>
-                            </Col>
-                            <Col span="8">
-                            <p class="text-right"><Icon type="social-octocat"></Icon>名称</p>
-                            </Col>
-                            <Col span="16">
-                            <p class="text-left">{{ name }}</p>
-                            </Col>
-                            <Col span="8">
-                            <p class="text-right"><Icon type="ios-paw"></Icon>生日</p>
-                            </Col>
-                            <Col span="16">
-                            <p class="text-left">{{ fmtBirthday }}</p>
-                            </Col>
-                        </Row>
-                    </div>
-                    </Col>
-                </Row>
-            </Card>
+                    <Row type="flex" justify="center" align="middle" class="pet-pt-16 pet-pb-16">
+                        <Col span="24">
+                            <img class="pet-avatar" :src="card.photo" alt="">
+                        </Col>
+                        <Col span="24">
+                            <Button type="error" shape="circle"
+                                    icon="heart" size="large"
+                                    @click="handleLikeClick(card.id)">赞赏</Button>
+                            <router-link :to="'/detail/' + card.id">
+                                <Button type="ghost" shape="circle"
+                                        icon="chatbubble-working" size="large">评论</Button>
+                            </router-link>
+                        </Col>
+                    </Row>
+                    <Row type="flex" justify="center" align="top" class="pet-pt-16 pet-pb-16">
+                        <Col span="24">
+                        <div>
+                            <Row type="flex" justify="center" align="top">
+                                <Col span="8">
+                                <p class="text-right"><Icon type="at"></Icon> ID</p>
+                                </Col>
+                                <Col span="16">
+                                <p class="text-left">{{ card.id }}</p>
+                                </Col>
+                                <Col span="8">
+                                <p class="text-right"><Icon type="social-octocat"></Icon>名称</p>
+                                </Col>
+                                <Col span="16">
+                                <p class="text-left">{{ card.name }}</p>
+                                </Col>
+                                <Col span="8">
+                                <p class="text-right"><Icon type="ios-paw"></Icon>生日</p>
+                                </Col>
+                                <Col span="16">
+                                <p class="text-left">{{ card.birthday | dateFmt }}</p>
+                                </Col>
+                            </Row>
+                        </div>
+                        </Col>
+                    </Row>
+                </Card>
+            </Col>
+            <Col span="12" v-if="noMoreData">
+                <div style="text-align: center">
+                    <h1><img :src="require('../chameleon.png')" alt=""></h1>
+                    <h2 class="pet-mb-32">这里已经没有更多的内容啦~</h2>
+                </div>
             </Col>
         </Row>
         <Spin size="large" fix v-if="loading"></Spin>
@@ -98,6 +104,7 @@
                 petCards: [],
                 loading: true,
                 interval: null,
+                noMoreData: false,
                 exCount: 0,
                 rewardValue: ''
             }
@@ -111,6 +118,20 @@
                 this.exCount++;
                 this.initAccount();
             }, 1000);
+        },
+        filters: {
+            dateFmt: function (dateString) {
+                let date = typeof dateString !== 'object' ? new Date(dateString) : dateString;
+                const tmpDate = {
+                    year: date.getFullYear(),
+                    month: (date.getMonth() < 9) ? '0' + (date.getMonth() + 1) : (date.getMonth() + 1),
+                    day: (date.getDate() < 10) ? '0' + date.getDate() : date.getDate(),
+                    hour: (date.getHours() < 10) ? '0' + date.getHours() : date.getHours(),
+                    min: (date.getMinutes() < 10) ? '0' + date.getMinutes() : date.getMinutes(),
+                    sec: (date.getSeconds() < 10) ? '0' + date.getSeconds() : date.getSeconds()
+                };
+                return `${tmpDate.year}年${tmpDate.month}月${tmpDate.day}日`;
+            }
         },
         methods: {
             initAccount() {
@@ -129,6 +150,14 @@
                               <p>确认导入钱包并解锁后，请刷新页面重新进行操作 :)</p>`
                 });
             },
+            getMaxAmount() {
+                let to = util.getContractAddress();
+                nebPay.simulateCall(to, '0', 'getAmountOfPetCards', "[]", {
+                    listener: (data) => {
+                        this.size = util.parse(data.result);
+                    }
+                });
+            },
             getPetCards() {
                 if (!this.account) {
                     this.showError();
@@ -138,19 +167,15 @@
                 let to = util.getContractAddress(),
                     args = util.toSting([this.page, this.limit]);
                 nebPay.simulateCall(to, '0', 'getPetCards', args, {
-                    listener: this.setPetCardDetail
+                    listener: (data) => {
+                        console.log(data)
+                        const res = util.parse(data.result);
+                        this.petCards = res.petCards;
+                        this.size = res.size;
+                        this.noMoreData = !this.petCards.length;
+                        this.loading = false;
+                    }
                 });
-            },
-            setPetCardDetail(data) {
-                if (data.result !== "null") {
-                    const res = util.parse(data.result);
-                    this.id = res.id;
-                    this.avatar = res.photo;
-                    this.name = res.name;
-                    this.birthday = res.birthday;
-                    this.remark = res.remark;
-                }
-                this.loading = false;
             },
             handleLikeCallback(data) {
                 if (typeof data !== 'string') {

@@ -119,10 +119,20 @@ PetCardContract.prototype = {
         if (!limit) {
             limit = 12;
         }
-        var start = (page - 1) * limit + 1,
-            end = page * limit,
+        // fixme: 页码和数量问题(倒序)
+        var maxAmount = this.currentPetCardId,
+            maxPage = maxAmount % limit,
+            start = null,
+            end = null,
             petCardsArray = [];
-
+        if (maxPage <= page) {
+            var leftAmount = maxAmount - maxPage * limit;
+            start = 1;
+            end = leftAmount;
+        } else {
+            start = maxAmount - page * limit + 1;
+            end = maxAmount - (page - 1) * limit;
+        }
         for (var i = start; i <= end; i++) {
             var petCard = this.getPetCardById(i);
             petCardsArray.unshift(petCard);
@@ -131,7 +141,7 @@ PetCardContract.prototype = {
             petCards: petCardsArray,
             page: page,
             limit: limit,
-            size: this.currentPetCardId
+            size: maxAmount
         };
     },
 
