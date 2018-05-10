@@ -92,22 +92,15 @@
                 </Card>
             </Col>
         </Row>
-        <Row type="flex" justify="center" align="middle">
-            <Col span="12">
-
-            </Col>
-        </Row>
         <Spin size="large" fix v-if="loading"></Spin>
     </div>
 </template>
 <script>
     import util from '../libs/util';
     import NebPay from '../libs/nebpay';
-    import {Neb, HttpRequest, Account} from 'nebulas';
+    import {Account} from 'nebulas';
 
-    var neb = new Neb();
     var nebPay = new NebPay();
-    neb.setRequest(new HttpRequest("https://testnet.nebulas.io"));
 
     export default {
         data() {
@@ -123,7 +116,8 @@
                 found: false,
                 showNotfound: false,
                 interval: null,
-                exCount: 0
+                exCount: 0,
+                rewardValue: ''
             }
         },
         computed: {
@@ -131,7 +125,7 @@
                 if (this.birthday) {
                     return util.dateFmt(this.birthday);
                 }
-                return '';
+                return '未知';
             }
         },
         watch: {
@@ -193,15 +187,53 @@
                 }
                 this.loading = false;
             },
+            handleLikeCallback(data) {
+                if (typeof data !== 'string') {
+                    this.$Modal.success({
+                        title: '赞赏成功',
+                        content: '感谢您的赞赏 :)'
+                    });
+                } else {
+                    this.$Modal.error({
+                        title: '交易取消',
+                        content: '赞赏失败 :('
+                    });
+                }
+                this.loading = false;
+            },
             handleLikeClick() {
-                
+                this.$Modal.confirm({
+                    render: (h) => {
+                        return h('div', [
+                            h('p', '* 赞赏单位为 NAS（1 NAS = 1EWei = 10^18 Wei）'),
+                            h('Input', {
+                                props: {
+                                    value: this.rewardValue,
+                                    autofocus: true,
+                                    placeholder: '请输入赞赏数额...'
+                                },
+                                on: {
+                                    input: (val) => {
+                                        this.rewardValue = val;
+                                    }
+                                }
+                            })
+                        ]);
+                    },
+                    onOk: () => {
+                        this.loading = true;
+                        nebPay.call(util.getContractAddress(), this.rewardValue, 'getPetCardById', "[]", {
+                            listener: this.handleLikeCallback
+                        })
+                    }
+                });
             },
             handleSearchClick() {
                 let id = this.petCardId;
-                this.$router.replace(`/search/${id}`);
+                this.$router.push(`/search/${id}`);
                 this.loading = true;
                 this.showNotfound = false;
             }
-        },
+        }
     };
 </script>
