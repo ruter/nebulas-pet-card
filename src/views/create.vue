@@ -76,13 +76,14 @@
         <Row type="flex" justify="center" align="middle" class="pet-mb-160">
             <Col span="12" v-if="currentStep === 0">
                 <Form ref="petCardForm" :model="petCardForm" :rules="ruleValidate" :label-width="80">
-                    <FormItem label="萌宠照片">
+                    <FormItem label="萌宠照片" prop="avatar">
                         <div v-if="petCardForm.avatar" class="pet-upload-image">
                             <img :src="petCardForm.avatar">
                             <div class="pet-upload-image-cover">
                                 <Icon type="ios-eye-outline" @click.native="handleView"></Icon>
                                 <Icon type="ios-trash-outline" @click.native="handleRemove"></Icon>
                             </div>
+                            <input type="hidden" v-model="petCardForm.avatar">
                         </div>
                         <div v-else>
                             <input id="petAvatar" type="file" accept="image/*" style="display: none;" @change="handleImgUpload"/>
@@ -133,7 +134,7 @@
                 <div style="text-align: center">
                     <h1><img :src="require('../chameleon.png')" alt=""></h1>
                     <h2 class="pet-mb-32">「{{ petCardForm.name }}」的宠物卡已经创建，你可以在「个人中心」-「宠物卡」中查看</h2>
-                    <p>* 数据写入需要一定时间，如果不能马上看到新创建的宠物卡，可以稍候再刷新查看</p>
+                    <p class="pet-mb-32">* 数据写入需要一定时间，如果不能马上看到新创建的宠物卡，可以稍候再刷新查看</p>
                     <router-link to="/">
                         <Button type="primary" size="large">返回首页</Button>
                     </router-link>
@@ -176,10 +177,14 @@
                     ],
                     desc: [
                         { required: true, message: '有什么想对 ta 说的吗', trigger: 'blur' }
+                    ],
+                    avatar: [
+                        { required: true, message: ' ', trigger: 'change' }
                     ]
                 },
                 loading: false,
-                viewImage: false
+                viewImage: false,
+                imageURL: ''
             }
         },
         computed: {
@@ -205,6 +210,7 @@
                 this.viewImage = true;
             },
             handleRemove() {
+                this.imageURL = '';
                 this.petCardForm.avatar = '';
             },
             handleImgUpload(e) {
@@ -221,7 +227,7 @@
                 formData.append('ssl', true);
 
                 util.uploadImg(formData).then(res => {
-                    this.petCardForm.avatar = res.data.data.url;
+                    this.imageURL = res.data.data.url;
                 }).catch(err => {
                     console.error(err);
                 })
@@ -241,7 +247,7 @@
                     let info = {
                         name: this.petCardForm.name,
                         birthday: +this.petCardForm.birthday,
-                        photo: this.petCardForm.avatar,
+                        photo: this.imageURL,
                         remark: this.petCardForm.desc
                     };
                     this.handleCreate(info);
@@ -259,7 +265,14 @@
                     args = util.toSting([info]);
                 this.serialNumber = nebPay.call(to, '0', 'createPetCard', args, {
                     listener: (data) => {
-                        this.currentStep++;
+                        if (typeof data === 'object') {
+                            this.currentStep++;
+                        } else {
+                            this.$Modal.error({
+                                title: '创建失败',
+                                content: '交易被取消，宠物卡创建失败'
+                            });
+                        }
                         this.loading = false;
                     }
                 });
