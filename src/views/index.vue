@@ -73,7 +73,7 @@
         methods: {
             handleSearchClick() {
                 let id = this.petCardId;
-                this.$router.push(`/search?id=${id}`);
+                this.$router.push(`/search/${id}`);
             }
         }
     };

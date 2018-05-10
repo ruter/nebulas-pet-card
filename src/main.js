@@ -7,6 +7,8 @@ import Util from './libs/util';
 import App from './app.vue';
 import 'iview/dist/styles/iview.css';
 
+import NebPay from './libs/nebpay';
+
 
 Vue.use(VueRouter);
 
@@ -22,9 +24,18 @@ const RouterConfig = {
 };
 const router = new VueRouter(RouterConfig);
 
+let nebPay = new NebPay();
+
 router.beforeEach((to, from, next) => {
     iView.LoadingBar.start();
     Util.title(to.meta.title);
+    localStorage.removeItem('nasAddress');
+    nebPay.simulateCall(Util.getContractAddress(), "0", "getUserAddress", "", {
+        listener: (res) => {
+            const address = Util.parse(res.result);
+            localStorage.setItem('nasAddress', address);
+        }
+    });
     next();
 });
 

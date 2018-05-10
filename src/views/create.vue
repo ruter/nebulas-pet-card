@@ -159,7 +159,6 @@
             return {
                 account: null,
                 currentStep: 0,
-                serialNumber: '',
                 petCardForm: {
                     name: '',
                     date: '',
@@ -191,18 +190,14 @@
             }
         },
         created() {
-            this.getAccount();
+            this.initAccount();
         },
         methods: {
-            initAccount(data) {
-                const address = util.parse(data.result);
-                this.account = Account.fromAddress(address);
-            },
-            getAccount() {
-                let self = this;
-                nebPay.simulateCall(util.getContractAddress(), "0", "getUserAddress", "", {
-                    listener: self.initAccount
-                });
+            initAccount() {
+                const address = localStorage.getItem('nasAddress');
+                if (address) {
+                    this.account = Account.fromAddress(address);
+                }
             },
             handleView() {
                 this.viewImage = true;
@@ -261,7 +256,7 @@
             handleCreate(info) {
                 let to = util.getContractAddress(),
                     args = util.toSting([info]);
-                this.serialNumber = nebPay.call(to, '0', 'createPetCard', args, {
+                nebPay.call(to, '0', 'createPetCard', args, {
                     listener: (data) => {
                         if (typeof data === 'object') {
                             this.currentStep++;

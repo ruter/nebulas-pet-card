@@ -81,7 +81,11 @@ PetCardContract.prototype = {
 
     // 获取宠物卡
     getPetCardById: function (id) {
-        return this.petCards.get(id);
+        if (id > 0 && id <= this.currentPetCardId) {
+            return this.petCards.get(id);
+        } else {
+            throw new Error("Pet Card Does Not Exist")
+        }
     },
 
     getPetCardsByOwner: function (address) {
