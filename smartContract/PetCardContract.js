@@ -195,7 +195,7 @@ PetCardContract.prototype = {
         } else {
             var reward = this.petRewards.get(from);
             // fixme: test transfer limit
-            if (reward && !amount.gt(reward.balance) && amount.gte(this.transferLimit)) {
+            if (reward && !amount.gt(reward.balance) && amount.gt(this.transferLimit)) {
                 // 扣除转出费用
                 var transferFee = amount.times(this.transferFee);
                 var diff = amount.minus(transferFee);

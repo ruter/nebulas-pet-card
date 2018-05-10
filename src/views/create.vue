@@ -61,6 +61,15 @@
         -moz-transform: translateY(50%);
         -webkit-transform: translateY(50%);
     }
+    .text-right {
+        text-align: right;
+    }
+    .text-left {
+        text-align: left;
+    }
+    p.text-right {
+        margin-right: 8px;
+    }
 </style>
 <template>
     <div class="index">
@@ -119,10 +128,26 @@
                         </Col>
                         <Col span="16">
                             <div style="margin-top: 32px">
-                                <p>爱宠名称：{{ petCardForm.name }}</p>
-                                <p>出生日期：{{ fmtBirthday }}</p>
-                                <p>主人寄语：</p>
-                                <p>{{ petCardForm.desc }}</p>
+                                <Row type="flex" justify="center" align="top">
+                                    <Col span="8">
+                                    <p class="text-right"><Icon type="social-octocat"></Icon>爱宠名称</p>
+                                    </Col>
+                                    <Col span="16">
+                                    <p class="text-left">{{ petCardForm.name }}</p>
+                                    </Col>
+                                    <Col span="8">
+                                    <p class="text-right"><Icon type="ios-paw"></Icon>出生日期</p>
+                                    </Col>
+                                    <Col span="16">
+                                    <p class="text-left">{{ fmtBirthday }}</p>
+                                    </Col>
+                                    <Col span="8">
+                                    <p class="text-right"><Icon type="heart"></Icon>主人寄语</p>
+                                    </Col>
+                                    <Col span="16">
+                                    <p class="text-left">{{ petCardForm.desc }}</p>
+                                    </Col>
+                                </Row>
                             </div>
                         </Col>
                     </Row>
@@ -181,7 +206,9 @@
                 },
                 loading: false,
                 viewImage: false,
-                imageURL: ''
+                imageURL: '',
+                interval: null,
+                exCount: 0
             }
         },
         computed: {
@@ -190,12 +217,20 @@
             }
         },
         created() {
-            this.initAccount();
+            this.interval = setInterval(() => {
+                if (this.exCount > 5) {
+                    clearInterval(this.interval);
+                    this.showError();
+                }
+                this.exCount++;
+                this.initAccount();
+            }, 1000);
         },
         methods: {
             initAccount() {
                 const address = localStorage.getItem('nasAddress');
                 if (address) {
+                    clearInterval(this.interval);
                     this.account = Account.fromAddress(address);
                 }
             },
