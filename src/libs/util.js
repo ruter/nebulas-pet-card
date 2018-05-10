@@ -17,6 +17,19 @@ util.toSting = function (data) {
     return JSON.stringify(data);
 };
 
+util.dateFmt = function (dateString) {
+    let date = typeof dateString !== 'object' ? new Date(dateString) : dateString;
+    const tmpDate = {
+        year: date.getFullYear(),
+        month: (date.getMonth() < 9) ? '0' + (date.getMonth() + 1) : (date.getMonth() + 1),
+        day: (date.getDate() < 10) ? '0' + date.getDate() : date.getDate(),
+        hour: (date.getHours() < 10) ? '0' + date.getHours() : date.getHours(),
+        min: (date.getMinutes() < 10) ? '0' + date.getMinutes() : date.getMinutes(),
+        sec: (date.getSeconds() < 10) ? '0' + date.getSeconds() : date.getSeconds()
+    };
+    return `${tmpDate.year}年${tmpDate.month}月${tmpDate.day}日`;
+};
+
 util.title = function(title) {
     title = title ? title + ' - 宠物卡' : '宠物卡';
     window.document.title = title;
@@ -31,6 +44,12 @@ const ajaxUrl = env === 'development' ?
 util.ajax = axios.create({
     baseURL: ajaxUrl,
     timeout: 30000
+});
+
+util.uploadImg = axios.create({
+    baseURL: 'https://sm.ms',
+    timeout: 30000,
+    headers: {"Access-Control-Allow-Origin": "*"}
 });
 
 export default util;
