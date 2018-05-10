@@ -94,6 +94,20 @@ PetCardContract.prototype = {
         }
     },
 
+    getPetCardsByIds: function (ids) {
+        var from = Blockchain.transaction.from;
+        var petCards = this.getPetCardsByOwner(from) || [];
+        if (petCards.sort().toString() === ids.sort().toString()) {
+            var petCardsByOwner = [];
+            for (var i = 0; i < petCards.length; i++) {
+                petCardsByOwner.unshift(this.petCards.get(petCards[i]));
+            }
+            return petCardsByOwner;
+        } else {
+            throw new Error("Invalid Pet Card IDs");
+        }
+    },
+
     getPetCardsByOwner: function (address) {
         return this.petCardsOfOwner.get(address);
     },
