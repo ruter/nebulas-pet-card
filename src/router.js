@@ -6,6 +6,13 @@ const routers = [{
     },
     component: (resolve) => require(['./views/index.vue'], resolve)
 }, {
+    path: '/explore',
+    meta: {
+        title: '探索宠物卡',
+        breadcrumbs: ['探索宠物卡']
+    },
+    component: (resolve) => require(['./views/cardList.vue'], resolve)
+}, {
     path: '/create',
     meta: {
         title: '创建宠物卡',

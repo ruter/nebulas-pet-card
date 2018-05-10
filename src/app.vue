@@ -42,7 +42,7 @@
                                 首页
                             </MenuItem>
                         </router-link>
-                        <router-link to="/petcard">
+                        <router-link to="/explore">
                             <MenuItem name="petcard">
                                 <Icon type="social-octocat"></Icon>
                                 探索宠物卡

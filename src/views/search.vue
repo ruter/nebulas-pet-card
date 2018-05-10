@@ -188,6 +188,7 @@
                 this.loading = false;
             },
             handleLikeCallback(data) {
+                console.log(data)
                 if (typeof data !== 'string') {
                     this.$Modal.success({
                         title: '赞赏成功',
@@ -222,7 +223,8 @@
                     },
                     onOk: () => {
                         this.loading = true;
-                        nebPay.call(util.getContractAddress(), this.rewardValue, 'getPetCardById', "[]", {
+                        var args = util.toSting([this.id]);
+                        nebPay.call(util.getContractAddress(), this.rewardValue, 'giveItReward', args, {
                             listener: this.handleLikeCallback
                         })
                     }
