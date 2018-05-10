@@ -88,6 +88,29 @@ PetCardContract.prototype = {
         return this.petCardsOfOwner.get(address);
     },
 
+    getPetCards: function (page, limit) {
+        if (!page) {
+            page = 1;
+        }
+        if (!limit) {
+            limit = 12;
+        }
+        var start = (page - 1) * limit + 1,
+            end = page * limit,
+            petCardsArray = [];
+
+        for (var i = start; i <= end; i++) {
+            var petCard = this.getPetCardById(i);
+            petCardsArray.unshift(petCard);
+        }
+        return {
+            petCards: petCardsArray,
+            page: page,
+            limit: limit,
+            size: this.currentPetCardId
+        };
+    },
+
     getComments: function (id) {
         return this.comments.get(id);
     },
