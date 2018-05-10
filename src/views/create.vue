@@ -220,9 +220,8 @@
                 formData.append('smfile',img);
                 formData.append('ssl', true);
 
-                util.uploadImg.post('/api/upload', formData).then(res => {
-                    this.petCardForm.avatar = res.data.url;
-                    console.log('===========', res);
+                util.uploadImg(formData).then(res => {
+                    this.petCardForm.avatar = res.data.data.url;
                 }).catch(err => {
                     console.error(err);
                 })

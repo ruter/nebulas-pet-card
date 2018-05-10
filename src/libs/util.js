@@ -46,10 +46,8 @@ util.ajax = axios.create({
     timeout: 30000
 });
 
-util.uploadImg = axios.create({
-    baseURL: 'https://sm.ms',
-    timeout: 30000,
-    headers: {"Access-Control-Allow-Origin": "*"}
-});
+util.uploadImg = function (data) {
+    return axios.post('https://sm.ms/api/upload', data);
+};
 
 export default util;
