@@ -150,11 +150,9 @@
 <script>
     import util from '../libs/util';
     import NebPay from '../libs/nebpay';
-    import {Neb, HttpRequest, Account} from 'nebulas';
+    import {Account} from 'nebulas';
 
-    var neb = new Neb();
     var nebPay = new NebPay();
-    neb.setRequest(new HttpRequest("https://testnet.nebulas.io"));
 
     export default {
         data() {
