@@ -31,6 +31,7 @@ var PetCardContract = function () {
     LocalContractStorage.defineProperties(this, {
         currentPetCardId: null,
         superuserAddress: null,
+        transferLimit: null,
         transferFee: null
     });
     LocalContractStorage.defineMapProperty(this, 'petCards', {
@@ -51,6 +52,7 @@ PetCardContract.prototype = {
     init: function () {
         this.currentPetCardId = 0;
         this.superuserAddress = Blockchain.transaction.from;
+        this.transferLimit = 0.001;
         // 1% 转出费率
         this.transferFee = 0.01;
     },
@@ -68,6 +70,10 @@ PetCardContract.prototype = {
 
     getUserReward: function () {
         return this.petRewards.get(Blockchain.transaction.from);
+    },
+
+    getTransferLimit: function () {
+        return this.transferLimit;
     },
 
     // 获取当前转出费率
@@ -188,7 +194,8 @@ PetCardContract.prototype = {
             Blockchain.transfer(this.superuserAddress, amount);
         } else {
             var reward = this.petRewards.get(from);
-            if (reward && !amount.gt(reward.balance)) {
+            // fixme: test transfer limit
+            if (reward && !amount.gt(reward.balance) && amount.gte(this.transferLimit)) {
                 // 扣除转出费用
                 var transferFee = amount.times(this.transferFee);
                 var diff = amount.minus(transferFee);
@@ -212,6 +219,14 @@ PetCardContract.prototype = {
     setSuperuserAddress: function(address) {
         if (Blockchain.transaction.from === this.superuserAddress) {
             this.superuserAddress = address;
+        } else {
+            throw new Error("Permission Denied");
+        }
+    },
+
+    setTransferLimit: function (value) {
+        if (Blockchain.transaction.from === this.superuserAddress) {
+            this.transferLimit = value;
         } else {
             throw new Error("Permission Denied");
         }
