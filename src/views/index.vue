@@ -5,7 +5,8 @@
     }
 
     .index h1 {
-        height: 150px;
+        margin-top: 16px;
+        margin-bottom: 16px;
     }
 
     .index h1 img {
@@ -36,7 +37,7 @@
         <Row type="flex" justify="center" align="middle">
             <Col span="24">
                 <h1>
-                    <img src="https://raw.githubusercontent.com/iview/iview/master/assets/logo.png">
+                    <img :src="require('../logo.png')">
                 </h1>
                 <h2>
                     <p>

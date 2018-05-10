@@ -8,13 +8,17 @@
     }
     .layout-logo{
         width: 100px;
-        height: 30px;
-        background: #5b6270;
+        height: 32px;
+        /*background: #5b6270;*/
         border-radius: 3px;
         float: left;
         position: relative;
         top: 15px;
         left: 20px;
+    }
+    .layout-logo img {
+        width: 100px;
+        height: 32px;
     }
     .layout-nav{
         width: 400px;
@@ -30,7 +34,7 @@
         <Layout>
             <Header>
                 <Menu mode="horizontal" theme="dark" active-name="home">
-                    <div class="layout-logo"></div>
+                    <div class="layout-logo"><img :src="require('./logo.png')" alt=""></div>
                     <div class="layout-nav">
                         <router-link to="/">
                             <MenuItem name="home">
