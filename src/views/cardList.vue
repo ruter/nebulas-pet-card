@@ -89,7 +89,7 @@
             </div>
             </Col>
         </Row>
-        <Page :total="size" :page-size="1" show-elevator show-total
+        <Page :total="size" :page-size="limit" show-elevator show-total
               @on-change="handlePageChange">共 {{ size }} 张</Page>
         <Spin size="large" fix v-if="loading"></Spin>
     </div>

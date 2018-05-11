@@ -33,5 +33,12 @@ const routers = [{
         breadcrumbs: ['宠物卡详情']
     },
     component: (resolve) => require(['./views/detail.vue'], resolve)
+}, {
+    path: '/account',
+    meta: {
+        title: '个人中心',
+        breadcrumbs: ['个人中心']
+    },
+    component: (resolve) => require(['./views/account.vue'], resolve)
 }];
 export default routers;

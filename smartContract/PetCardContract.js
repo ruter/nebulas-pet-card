@@ -52,7 +52,7 @@ PetCardContract.prototype = {
     init: function () {
         this.currentPetCardId = 0;
         this.superuserAddress = Blockchain.transaction.from;
-        this.transferLimit = 0.001;
+        this.transferLimit = new BigNumber(1000000000000000);
         // 1% 转出费率
         this.transferFee = 0.01;
     },
@@ -218,7 +218,6 @@ PetCardContract.prototype = {
             Blockchain.transfer(this.superuserAddress, amount);
         } else {
             var reward = this.petRewards.get(from);
-            // fixme: test transfer limit
             if (reward && !amount.gt(reward.balance) && amount.gt(this.transferLimit)) {
                 // 扣除转出费用
                 var transferFee = amount.times(this.transferFee);
@@ -250,7 +249,7 @@ PetCardContract.prototype = {
 
     setTransferLimit: function (value) {
         if (Blockchain.transaction.from === this.superuserAddress) {
-            this.transferLimit = value;
+            this.transferLimit = new BigNumber(value);
         } else {
             throw new Error("Permission Denied");
         }

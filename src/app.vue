@@ -21,7 +21,7 @@
         height: 32px;
     }
     .layout-nav{
-        width: 400px;
+        width: 480px;
         margin: 0 auto;
         margin-right: 20px;
     }
@@ -40,6 +40,12 @@
                             <MenuItem name="home">
                                 <Icon type="ios-home"></Icon>
                                 首页
+                            </MenuItem>
+                        </router-link>
+                        <router-link to="/create">
+                            <MenuItem name="petcard">
+                                <Icon type="wand"></Icon>
+                                创建宠物卡
                             </MenuItem>
                         </router-link>
                         <router-link to="/explore">
