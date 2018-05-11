@@ -110,7 +110,7 @@
             </TabPane>
             <TabPane label="转移代币" icon="social-usd">
                 <Row type="flex" justify="center" align="middle">
-                    <Col span="16" style="text-align: center">
+                    <Col span="24" style="text-align: center">
                         <h2>
                             <span class="pet-mr-32">
                                 <Icon type="ios-infinite"></Icon>NAS 余额: {{ userReward }} Wei（{{ userReward | nasFromBasic }} NAS）
@@ -144,6 +144,7 @@
     import util from '../libs/util';
     import NebPay from '../libs/nebpay';
     import {Account, Unit} from 'nebulas';
+    import BigNumber from 'bignumber.js';
 
     var nebPay = new NebPay();
 
@@ -298,11 +299,23 @@
                     });
                     return;
                 }
+                this.loading = true;
                 nebPay.simulateCall(to, "0", 'transfer', args, {
                     listener: (data) => {
-                        console.log(data)
-                        let reward = util.parse(data.result);
-                        this.userReward = reward.balance;
+                        if (!data.execute_err) {
+                            userReward = new BigNumber(userReward);
+                            this.userReward = userReward.minus(Unit.toBasic(value));
+                            this.$Modal.success({
+                                title: '转出成功',
+                                content: '代币已转出，请稍候查看钱包交易记录'
+                            });
+                        } else {
+                            this.$Modal.error({
+                                title: '转出失败',
+                                content: '余额不足，无法转出'
+                            });
+                        }
+                        this.loading = false;
                     }
                 });
             },

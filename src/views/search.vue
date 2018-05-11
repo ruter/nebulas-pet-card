@@ -173,7 +173,7 @@
                 }
             },
             setPetCardDetail(data) {
-                if (data.result !== "null") {
+                if (data.result !== "null" && !data.execute_err) {
                     const res = util.parse(data.result);
                     this.id = res.id;
                     this.avatar = res.photo;
@@ -188,7 +188,6 @@
                 this.loading = false;
             },
             handleLikeCallback(data) {
-                console.log(data)
                 if (typeof data !== 'string') {
                     this.$Modal.success({
                         title: '赞赏成功',
