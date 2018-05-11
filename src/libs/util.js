@@ -6,7 +6,7 @@ let util = {
 };
 
 util.getContractAddress = function () {
-    return 'n1eoahN9QSuT95BpddovYrr1BmWrHq4hMNc';
+    return 'n1mkUqkbZshZhDr4tT5G2SUHg2Ym8mAYhz4';
 };
 
 util.parse = function (data) {

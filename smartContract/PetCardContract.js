@@ -218,7 +218,8 @@ PetCardContract.prototype = {
             Blockchain.transfer(this.superuserAddress, amount);
         } else {
             var reward = this.petRewards.get(from);
-            if (reward && !amount.gt(reward.balance) && amount.gt(this.transferLimit)) {
+            var balance = reward ? new BigNumber(reward.balance) : new BigNumber(0);
+            if (reward && !amount.gt(balance) && amount.gt(this.transferLimit)) {
                 // 扣除转出费用
                 var transferFee = amount.times(this.transferFee);
                 var diff = amount.minus(transferFee);
@@ -230,8 +231,8 @@ PetCardContract.prototype = {
                 }
                 this.petRewards.put(this.superuserAddress, {balance: transferFee});
                 // 更新用户账户
-                reward.balance = reward.balance.sub(amount);
-                this.petRewards.put(owner, reward);
+                reward.balance = balance.minus(amount);
+                this.petRewards.put(from, reward);
             } else {
                 throw new Error("Insufficient Balance");
             }
