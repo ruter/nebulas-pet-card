@@ -67,7 +67,7 @@
     export default {
         data() {
             return {
-                petCardId: null
+                petCardId: ''
             }
         },
 
