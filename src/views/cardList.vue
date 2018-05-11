@@ -14,6 +14,9 @@
         height: 160px;
         padding: 8px;
     }
+    .pet-mr-8 {
+        margin-right: 8px;
+    }
     .pet-pb-16 {
         padding-bottom: 16px;
     }
@@ -32,9 +35,9 @@
 </style>
 <template>
     <div class="index pet-mb-160">
-        <Row type="flex" justify="center" align="middle">
+        <Row type="flex" align="middle">
             <Col span="4" style="text-align: center" v-for="card in petCards" :key="card.id">
-                <Card class="pet-mb-32">
+                <Card class="pet-mb-32 pet-mr-8">
                     <Row type="flex" justify="center" align="middle" class="pet-pt-16 pet-pb-16">
                         <Col span="24">
                             <img class="pet-avatar" :src="card.photo" alt="">
@@ -77,13 +80,17 @@
                     </Row>
                 </Card>
             </Col>
-            <Col span="12" v-if="noMoreData">
-                <div style="text-align: center">
-                    <h1><img :src="require('../chameleon.png')" alt=""></h1>
-                    <h2 class="pet-mb-32">这里已经没有更多的内容啦~</h2>
-                </div>
+        </Row>
+        <Row type="flex" justify="center" align="middle" v-if="noMoreData">
+            <Col span="12">
+            <div style="text-align: center">
+                <h1><img :src="require('../chameleon.png')" alt=""></h1>
+                <h2 class="pet-mb-32">这里已经没有更多的内容啦~</h2>
+            </div>
             </Col>
         </Row>
+        <Page :total="size" :page-size="1" show-elevator show-total
+              @on-change="handlePageChange">共 {{ size }} 张</Page>
         <Spin size="large" fix v-if="loading"></Spin>
     </div>
 </template>
@@ -98,9 +105,9 @@
         data() {
             return {
                 account: null,
-                page: 0,
+                page: 1,
                 limit: 12,
-                size: null,
+                size: 0,
                 petCards: [],
                 loading: true,
                 interval: null,
@@ -121,16 +128,20 @@
         },
         filters: {
             dateFmt: function (dateString) {
-                let date = typeof dateString !== 'object' ? new Date(dateString) : dateString;
-                const tmpDate = {
-                    year: date.getFullYear(),
-                    month: (date.getMonth() < 9) ? '0' + (date.getMonth() + 1) : (date.getMonth() + 1),
-                    day: (date.getDate() < 10) ? '0' + date.getDate() : date.getDate(),
-                    hour: (date.getHours() < 10) ? '0' + date.getHours() : date.getHours(),
-                    min: (date.getMinutes() < 10) ? '0' + date.getMinutes() : date.getMinutes(),
-                    sec: (date.getSeconds() < 10) ? '0' + date.getSeconds() : date.getSeconds()
-                };
-                return `${tmpDate.year}年${tmpDate.month}月${tmpDate.day}日`;
+                if (dateString) {
+                    let date = typeof dateString !== 'object' ? new Date(dateString) : dateString;
+                    const tmpDate = {
+                        year: date.getFullYear(),
+                        month: (date.getMonth() < 9) ? '0' + (date.getMonth() + 1) : (date.getMonth() + 1),
+                        day: (date.getDate() < 10) ? '0' + date.getDate() : date.getDate(),
+                        hour: (date.getHours() < 10) ? '0' + date.getHours() : date.getHours(),
+                        min: (date.getMinutes() < 10) ? '0' + date.getMinutes() : date.getMinutes(),
+                        sec: (date.getSeconds() < 10) ? '0' + date.getSeconds() : date.getSeconds()
+                    };
+                    return `${tmpDate.year}年${tmpDate.month}月${tmpDate.day}日`;
+                } else {
+                    return '未知';
+                }
             }
         },
         methods: {
@@ -163,12 +174,10 @@
                     this.showError();
                     return;
                 }
-                this.page++;
                 let to = util.getContractAddress(),
                     args = util.toSting([this.page, this.limit]);
                 nebPay.simulateCall(to, '0', 'getPetCards', args, {
                     listener: (data) => {
-                        console.log(data)
                         const res = util.parse(data.result);
                         this.petCards = res.petCards;
                         this.size = res.size;
@@ -176,6 +185,11 @@
                         this.loading = false;
                     }
                 });
+            },
+            handlePageChange(page) {
+                this.loading = true;
+                this.page = page;
+                this.getPetCards();
             },
             handleLikeCallback(data) {
                 if (typeof data !== 'string') {

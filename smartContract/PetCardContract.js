@@ -119,23 +119,23 @@ PetCardContract.prototype = {
         if (!limit) {
             limit = 12;
         }
-        // fixme: 页码和数量问题(倒序)
         var maxAmount = this.currentPetCardId,
-            maxPage = maxAmount % limit,
+            maxPage = Math.floor(maxAmount / limit) + 1,
             start = null,
             end = null,
             petCardsArray = [];
-        if (maxPage <= page) {
-            var leftAmount = maxAmount - maxPage * limit;
-            start = 1;
-            end = leftAmount;
-        } else {
-            start = maxAmount - page * limit + 1;
-            end = maxAmount - (page - 1) * limit;
-        }
-        for (var i = start; i <= end; i++) {
-            var petCard = this.getPetCardById(i);
-            petCardsArray.unshift(petCard);
+        if (maxAmount > 0 && page <= maxPage) {
+            if (maxPage === page) {
+                start = 1;
+                end = maxAmount - (page - 1) * limit;
+            } else {
+                start = maxAmount - page * limit + 1;
+                end = maxAmount - (page - 1) * limit;
+            }
+            for (var i = start; i <= end; i++) {
+                var petCard = this.getPetCardById(i);
+                petCardsArray.unshift(petCard);
+            }
         }
         return {
             petCards: petCardsArray,

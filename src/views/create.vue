@@ -274,7 +274,7 @@
                     this.loading = true;
                     let info = {
                         name: this.petCardForm.name,
-                        birthday: +this.petCardForm.birthday,
+                        birthday: +this.petCardForm.date,
                         photo: this.imageURL,
                         remark: this.petCardForm.desc
                     };
