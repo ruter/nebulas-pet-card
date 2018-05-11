@@ -159,7 +159,7 @@
                 <div style="text-align: center">
                     <h1><img :src="require('../chameleon.png')" alt=""></h1>
                     <h2 class="pet-mb-32">「{{ petCardForm.name }}」的宠物卡已经创建，你可以在「个人中心」-「我的宠物卡」中查看</h2>
-                    <p class="pet-mb-32">* 数据写入需要一定时间，如果不能马上看到新创建的宠物卡，可以稍候再刷新查看</p>
+                    <p class="pet-mb-32">* 数据写入需要一点时间，如果不能马上看到新创建的宠物卡，可以稍候再刷新查看</p>
                     <router-link to="/">
                         <Button type="primary" size="large">返回首页</Button>
                     </router-link>

@@ -232,7 +232,6 @@
                     args = util.toSting([this.petCardId]);
                 nebPay.simulateCall(to, '0', 'getComments', args, {
                     listener: (data) => {
-                        console.log(data);
                         const res = util.parse(data.result);
                         if (res && !!res.length) {
                             this.comments = res;
@@ -260,7 +259,6 @@
                     args = util.toSting([this.petCardId, content]);
                 nebPay.call(to, '0', 'createComment', args, {
                     listener: (data) => {
-                        console.log(data);
                         if (typeof data !== 'string') {
                             this.$Modal.success({
                                 title: '评论成功',
