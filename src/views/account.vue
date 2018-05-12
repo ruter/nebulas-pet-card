@@ -284,7 +284,7 @@
                     value = this.transferAmount,
                     limit = this.transferLimit,
                     userReward = this.userReward,
-                    args = util.toSting([value]);
+                    args = util.toSting([Unit.toBasic(value)]);
                 if (!(value && Unit.toBasic(value).gt(limit))) {
                     this.$Modal.warning({
                         title: '数额错误',
@@ -300,7 +300,7 @@
                     return;
                 }
                 this.loading = true;
-                nebPay.simulateCall(to, "0", 'transfer', args, {
+                nebPay.call(to, "0", 'transfer', args, {
                     listener: (data) => {
                         if (!data.execute_err) {
                             userReward = new BigNumber(userReward);
